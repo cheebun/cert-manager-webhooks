@@ -1,0 +1,68 @@
+version: 2
+
+project_name: namesilo-webhook
+
+builds:
+  - id: namesilo-webhook
+    binary: webhook
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -extldflags "-static"
+    flags:
+      - -trimpath
+
+dockers:
+  - id: namesilo-webhook-amd64
+    ids:
+      - namesilo-webhook
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-amd64
+    build_flag_templates:
+      - --platform=linux/amd64
+
+  - id: namesilo-webhook-arm64
+    ids:
+      - namesilo-webhook
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-arm64
+    build_flag_templates:
+      - --platform=linux/arm64
+
+docker_manifests:
+  - name_template: ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-amd64
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-arm64
+
+  - name_template: ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:latest
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-amd64
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/namesilo:{{ .Tag }}-arm64
+
+archives:
+  - id: namesilo-webhook
+    format: tar.gz
+    name_template: "namesilo-webhook_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "namesilo-webhook_{{ .Version }}_checksums.txt"
+
+release:
+  disable: true
+
+changelog:
+  disable: true

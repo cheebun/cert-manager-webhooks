@@ -1,0 +1,65 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "spaceship-webhook.selfSignedIssuer" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "spaceship-webhook.name" . }}
+    chart: {{ include "spaceship-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "spaceship-webhook.rootCACertificate" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "spaceship-webhook.name" . }}
+    chart: {{ include "spaceship-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  secretName: {{ include "spaceship-webhook.rootCACertificate" . }}
+  duration: 43800h # 5y
+  issuerRef:
+    name: {{ include "spaceship-webhook.selfSignedIssuer" . }}
+  commonName: "ca.spaceship-webhook.cert-manager"
+  isCA: true
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "spaceship-webhook.rootCAIssuer" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "spaceship-webhook.name" . }}
+    chart: {{ include "spaceship-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ca:
+    secretName: {{ include "spaceship-webhook.rootCACertificate" . }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "spaceship-webhook.servingCertificate" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "spaceship-webhook.name" . }}
+    chart: {{ include "spaceship-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  secretName: {{ include "spaceship-webhook.servingCertificate" . }}
+  duration: 8760h # 1y
+  issuerRef:
+    name: {{ include "spaceship-webhook.rootCAIssuer" . }}
+  dnsNames:
+  - {{ include "spaceship-webhook.fullname" . }}
+  - {{ include "spaceship-webhook.fullname" . }}.{{ .Release.Namespace }}
+  - {{ include "spaceship-webhook.fullname" . }}.{{ .Release.Namespace }}.svc

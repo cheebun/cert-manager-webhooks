@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: MIT
+
+package alidns
+
+import (
+	"encoding/json"
+	"testing"
+
+	cmmeta "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
+	"github.com/stretchr/testify/assert"
+	extapi "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+)
+
+var (
+	testAccessKeyIdRef = cmmeta.SecretKeySelector{
+		LocalObjectReference: cmmeta.LocalObjectReference{
+			Name: "alidns-secret",
+		},
+		Key: "access-key-id",
+	}
+	testAccessKeySecretRef = cmmeta.SecretKeySelector{
+		LocalObjectReference: cmmeta.LocalObjectReference{
+			Name: "alidns-secret",
+		},
+		Key: "access-key-secret",
+	}
+)
+
+func TestConfig_Validate(t *testing.T) {
+	t.Run("happy", func(t *testing.T) {
+		correct := &Config{
+			AccessKeyIdRef:     testAccessKeyIdRef,
+			AccessKeySecretRef: testAccessKeySecretRef,
+		}
+
+		loaded, err := LoadConfig(&extapi.JSON{Raw: mustMarshal(correct)})
+		if assert.NoError(t, err) {
+			assert.Equal(t, correct, loaded)
+		}
+	})
+
+	t.Run("compatible", func(t *testing.T) {
+		correct := &Config{
+			AccessKeyIdRef:     testAccessKeyIdRef,
+			SecretAccessKeyRef: testAccessKeySecretRef,
+		}
+
+		loaded, err := LoadConfig(&extapi.JSON{Raw: mustMarshal(correct)})
+		if assert.NoError(t, err) {
+			assert.NotEmpty(t, loaded)
+		}
+	})
+
+	t.Run("empty json", func(t *testing.T) {
+		_, err := LoadConfig(&extapi.JSON{Raw: []byte("{}")})
+		assert.Error(t, err)
+	})
+
+	t.Run("no accessKeyId", func(t *testing.T) {
+		bad := &Config{
+			SecretAccessKeyRef: testAccessKeySecretRef,
+		}
+
+		_, err := LoadConfig(&extapi.JSON{Raw: mustMarshal(bad)})
+		assert.Error(t, err)
+	})
+
+	t.Run("no accessKeySecret", func(t *testing.T) {
+		bad := &Config{
+			AccessKeyIdRef: testAccessKeyIdRef,
+		}
+
+		_, err := LoadConfig(&extapi.JSON{Raw: mustMarshal(bad)})
+		assert.Error(t, err)
+	})
+}
+
+func mustMarshal(v any) []byte {
+	data, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}

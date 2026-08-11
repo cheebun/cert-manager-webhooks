@@ -1,0 +1,8 @@
+go 1.26.5
+
+use (
+	./webhooks/alidns
+	./webhooks/namesilo
+	./webhooks/spaceship
+	./webhooks/tencent
+)

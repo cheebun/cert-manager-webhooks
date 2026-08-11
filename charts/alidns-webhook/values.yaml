@@ -1,0 +1,27 @@
+groupName: acme.mycompany.com
+
+certManager:
+  namespace: cert-manager
+  serviceAccountName: cert-manager
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/cheebun/cert-manager-webhooks/alidns
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 443
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

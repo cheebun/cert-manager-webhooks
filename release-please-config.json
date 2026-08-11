@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "separate-pull-requests": false,
+  "include-component-in-tag": true,
+  "tag-separator": "/",
+  "include-v-in-tag": true,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "sequential-calls": true,
+  "packages": {
+    "webhooks/namesilo": {
+      "release-type": "go",
+      "component": "namesilo",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "webhooks/tencent": {
+      "release-type": "go",
+      "component": "tencent",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "webhooks/spaceship": {
+      "release-type": "go",
+      "component": "spaceship",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "webhooks/alidns": {
+      "release-type": "go",
+      "component": "alidns",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
+}

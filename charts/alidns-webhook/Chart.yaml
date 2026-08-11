@@ -1,0 +1,9 @@
+apiVersion: v2
+name: alidns-webhook
+description: cert-manager ACME DNS01 webhook solver for Alibaba Cloud DNS (Alidns)
+home: https://github.com/cheebun/cert-manager-webhooks
+sources:
+  - https://github.com/cheebun/cert-manager-webhooks
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

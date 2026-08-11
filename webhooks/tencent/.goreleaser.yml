@@ -1,0 +1,68 @@
+version: 2
+
+project_name: tencent-webhook
+
+builds:
+  - id: tencent-webhook
+    binary: webhook
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -extldflags "-static"
+    flags:
+      - -trimpath
+
+dockers:
+  - id: tencent-webhook-amd64
+    ids:
+      - tencent-webhook
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-amd64
+    build_flag_templates:
+      - --platform=linux/amd64
+
+  - id: tencent-webhook-arm64
+    ids:
+      - tencent-webhook
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-arm64
+    build_flag_templates:
+      - --platform=linux/arm64
+
+docker_manifests:
+  - name_template: ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-amd64
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-arm64
+
+  - name_template: ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:latest
+    image_templates:
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-amd64
+      - ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/tencent:{{ .Tag }}-arm64
+
+archives:
+  - id: tencent-webhook
+    format: tar.gz
+    name_template: "tencent-webhook_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "tencent-webhook_{{ .Version }}_checksums.txt"
+
+release:
+  disable: true
+
+changelog:
+  disable: true

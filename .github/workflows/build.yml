@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Lint commit messages
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: .commitlintrc.json
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [alidns, namesilo, spaceship, tencent]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: webhooks/${{ matrix.provider }}/go.mod
+          cache-dependency-path: webhooks/${{ matrix.provider }}/go.sum
+      - run: go build ./...
+        working-directory: webhooks/${{ matrix.provider }}
+      - run: go vet ./...
+        working-directory: webhooks/${{ matrix.provider }}
+      - name: Test with coverage
+        run: go test -coverprofile=coverage.out -covermode=atomic ./...
+        working-directory: webhooks/${{ matrix.provider }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: webhooks/${{ matrix.provider }}/coverage.out
+          flags: ${{ matrix.provider }}
+          fail_ci_if_error: false

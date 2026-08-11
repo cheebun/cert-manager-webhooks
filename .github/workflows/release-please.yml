@@ -1,0 +1,224 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+  pages: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      releases-created:   ${{ steps.release.outputs.releases_created }}
+      namesilo-released:  ${{ steps.release.outputs['webhooks/namesilo--release_created'] }}
+      namesilo-tag:       ${{ steps.release.outputs['webhooks/namesilo--tag_name'] }}
+      tencent-released:   ${{ steps.release.outputs['webhooks/tencent--release_created'] }}
+      tencent-tag:        ${{ steps.release.outputs['webhooks/tencent--tag_name'] }}
+      spaceship-released: ${{ steps.release.outputs['webhooks/spaceship--release_created'] }}
+      spaceship-tag:      ${{ steps.release.outputs['webhooks/spaceship--tag_name'] }}
+      alidns-released:    ${{ steps.release.outputs['webhooks/alidns--release_created'] }}
+      alidns-tag:         ${{ steps.release.outputs['webhooks/alidns--tag_name'] }}
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  goreleaser-namesilo:
+    needs: release-please
+    if: needs.release-please.outputs.namesilo-released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: webhooks/namesilo/go.mod
+          cache-dependency-path: webhooks/namesilo/go.sum
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create local semver tag
+        id: tag
+        run: |
+          VERSION="${FULL_TAG#*/}"
+          git tag "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        env:
+          FULL_TAG: ${{ needs.release-please.outputs.namesilo-tag }}
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          workdir: webhooks/namesilo
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.version }}
+
+  goreleaser-tencent:
+    needs: release-please
+    if: needs.release-please.outputs.tencent-released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: webhooks/tencent/go.mod
+          cache-dependency-path: webhooks/tencent/go.sum
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create local semver tag
+        id: tag
+        run: |
+          VERSION="${FULL_TAG#*/}"
+          git tag "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        env:
+          FULL_TAG: ${{ needs.release-please.outputs.tencent-tag }}
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          workdir: webhooks/tencent
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.version }}
+
+  goreleaser-spaceship:
+    needs: release-please
+    if: needs.release-please.outputs.spaceship-released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: webhooks/spaceship/go.mod
+          cache-dependency-path: webhooks/spaceship/go.sum
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create local semver tag
+        id: tag
+        run: |
+          VERSION="${FULL_TAG#*/}"
+          git tag "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        env:
+          FULL_TAG: ${{ needs.release-please.outputs.spaceship-tag }}
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          workdir: webhooks/spaceship
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.version }}
+
+  goreleaser-alidns:
+    needs: release-please
+    if: needs.release-please.outputs.alidns-released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: webhooks/alidns/go.mod
+          cache-dependency-path: webhooks/alidns/go.sum
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create local semver tag
+        id: tag
+        run: |
+          VERSION="${FULL_TAG#*/}"
+          git tag "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        env:
+          FULL_TAG: ${{ needs.release-please.outputs.alidns-tag }}
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          workdir: webhooks/alidns
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.version }}
+
+  charts-release:
+    needs:
+      - release-please
+      - goreleaser-namesilo
+      - goreleaser-tencent
+      - goreleaser-spaceship
+      - goreleaser-alidns
+    if: |
+      always() &&
+      needs.release-please.outputs.releases-created == 'true' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v5
+
+      - name: Package and release charts
+        uses: helm/chart-releaser-action@v1.7.0
+        with:
+          charts_dir: charts
+          skip_existing: true
+        env:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

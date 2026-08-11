@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: MIT
+
+package main
+
+import (
+	"os"
+	_ "time/tzdata"
+
+	"github.com/cheebun/cert-manager-webhooks/webhooks/spaceship/spaceship"
+	"github.com/cert-manager/cert-manager/pkg/acme/webhook/cmd"
+	_ "golang.org/x/crypto/x509roots/fallback"
+)
+
+var (
+	GroupName = os.Getenv("GROUP_NAME")
+	LogLevel  = os.Getenv("LOG_LEVEL")
+)
+
+func main() {
+	if GroupName == "" {
+		panic("GROUP_NAME must be specified")
+	}
+	solver := spaceship.NewSolver()
+	if LogLevel != "" {
+		if err := solver.SetLogLevel(LogLevel); err != nil {
+			panic("invalid LOG_LEVEL: " + err.Error())
+		}
+	}
+	cmd.RunWebhookServer(GroupName, solver)
+}

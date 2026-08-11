@@ -1,0 +1,6 @@
+{
+  "webhooks/namesilo": "0.0.0",
+  "webhooks/tencent": "0.0.0",
+  "webhooks/spaceship": "0.0.0",
+  "webhooks/alidns": "0.0.0"
+}

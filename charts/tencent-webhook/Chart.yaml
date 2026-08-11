@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: "0.1.0"
+description: cert-manager webhook solver for Tencent DNSPod
+name: tencent-webhook
+version: "0.1.0"
+type: application

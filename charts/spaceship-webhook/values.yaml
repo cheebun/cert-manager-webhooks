@@ -1,0 +1,44 @@
+groupName: acme.mycompany.com
+
+certManager:
+  namespace: cert-manager
+  serviceAccountName: cert-manager
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/cheebun/cert-manager-webhooks/spaceship
+  tag: v0.1.0
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 443
+
+# Spaceship API credentials are read from a Kubernetes Secret at runtime.
+# Reference the Secret name and keys in your ClusterIssuer config:
+#
+#   config:
+#     apiKeyRef:
+#       name: spaceship-credentials
+#       key: api-key
+#     apiSecretRef:
+#       name: spaceship-credentials
+#       key: api-secret
+#
+# Create the Secret beforehand:
+#   kubectl create secret generic spaceship-credentials \
+#     --from-literal=api-key=vZhX1lQ2TAPuC9C1v7h5 \
+#     --from-literal=api-secret=kWPdROY158PyodJyCenqd0iXswcbLyQP61n2kVGc6CEf3sLFLd2olZS8GklYvg3x \
+#     --namespace=<issuer-namespace>
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
