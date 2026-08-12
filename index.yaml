@@ -1,0 +1,49 @@
+apiVersion: v1
+entries:
+  alidns-webhook:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-12T10:25:13.928939571Z"
+    description: cert-manager ACME DNS01 webhook solver for Alibaba Cloud DNS (Alidns)
+    digest: bb0dc4e931a43832e0900011bb047aca509c3fbdcd8695ddbc7eebae9521a83b
+    home: https://github.com/cheebun/cert-manager-webhooks
+    name: alidns-webhook
+    sources:
+    - https://github.com/cheebun/cert-manager-webhooks
+    type: application
+    urls:
+    - https://github.com/cheebun/cert-manager-webhooks/releases/download/alidns-webhook-0.1.0/alidns-webhook-0.1.0.tgz
+    version: 0.1.0
+  namesilo-webhook:
+  - apiVersion: v1
+    appVersion: 0.1.0
+    created: "2026-08-12T10:25:14.194127087Z"
+    description: namesilo cert-manager-webhook
+    digest: 70167e912c0f5a8bf9bb2df90aef762f9146964b6681de597f957f4b9b5015d0
+    name: namesilo-webhook
+    urls:
+    - https://github.com/cheebun/cert-manager-webhooks/releases/download/namesilo-webhook-0.1.0/namesilo-webhook-0.1.0.tgz
+    version: 0.1.0
+  spaceship-webhook:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-12T10:25:14.392224999Z"
+    description: cert-manager webhook solver for Spaceship DNS
+    digest: c8897af52ab5a4485075da245c51ca80f1466916f0002adcbdacdc8d6ee61a24
+    name: spaceship-webhook
+    type: application
+    urls:
+    - https://github.com/cheebun/cert-manager-webhooks/releases/download/spaceship-webhook-0.1.0/spaceship-webhook-0.1.0.tgz
+    version: 0.1.0
+  tencent-webhook:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-08-12T10:25:14.565064087Z"
+    description: cert-manager webhook solver for Tencent DNSPod
+    digest: b56e468934875b3bf16a8d6874b137444bd3c2a9de538366dfa9d7cb54b0d49d
+    name: tencent-webhook
+    type: application
+    urls:
+    - https://github.com/cheebun/cert-manager-webhooks/releases/download/tencent-webhook-0.1.0/tencent-webhook-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-08-12T10:25:14.565068686Z"
